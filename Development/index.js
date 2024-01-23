@@ -1,8 +1,23 @@
-// TODO: Include packages needed for this application
 const inquirer = require('inquirer');
 const fs = require('fs');
-const generate = require('')
-// TODO: Create an array of questions for user input
+const generateMarkdown = require('./utils/generateMarkdown');
+
+function renderLicense(license) {
+    if (license === 'MIT') {
+      return '[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)';
+    }
+    else if (license = 'Apache 2.0') {
+      return '[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)';
+    }
+    else if (license === 'BSD 3-Clause'){
+      return '[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)';
+    }
+    else if (value === 'None'){
+      return 'No license selected';
+    }
+  };
+  
+
 const questions = [
     {
         type: 'input',
@@ -34,7 +49,7 @@ const questions = [
         type: 'list',
         name: 'licenses',
         message: 'Please choose a license.',
-        choices: ['MIT', '']
+        choices: ['MIT', 'Apache 2.0', 'BSD 3-Clause', 'None'],
     },
     {
         type: 'input',
@@ -48,7 +63,7 @@ const questions = [
     },
     {
         type: 'input',
-        name: 'GitHub',
+        name: 'username',
         message: 'Please enter your GitHub username',
     },
     {
@@ -58,23 +73,22 @@ const questions = [
     },
 
 ];
-inquirer
-.prompt(questions)
-.then((response) =>
-{fs.writeFile('README.md',generate(data), function(err) {
-    if (err) {
-        throw err;
-    };
-    console.log('Successfully created a new README!');
-});
-});
-    console.log(response)
 
-// TODO: Create a function to write README file
-function writeToFile(fileName, data) {}
 
-// TODO: Create a function to initialize app
-function init() {}
+function writeToFile(fileName, data) {
+    fs.writeFile(fileName, generateMarkdown(data), function (err) {
+        if (err) {
+            return console.log(err);
+        }
+    });
+}
 
-// Function call to initialize app
+function init() {
+    inquirer.prompt(questions).then((data) => {
+        console.log(JSON.stringify(data, null, ' '));
+        data.renderLicense = renderLicense(data.license);
+        writeToFile('./README.md', data);
+    });
+};
+
 init();
